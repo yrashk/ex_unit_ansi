@@ -7,6 +7,34 @@ defmodule ExUnit.Formatter.ANSI do
 
   import Exception, only: [format_stacktrace: 1]
 
+  ## New API
+
+  def suite_started do
+    :gen_server.start_link({ :local, __MODULE__ }, __MODULE__, [], [])
+  end
+
+  def suite_finished do
+    :gen_server.call(__MODULE__, :finish)
+  end
+
+  def case_started(_) do
+    :ok
+  end
+
+  def case_finished(_) do
+    :ok
+  end
+
+  def test_started(_test_case, _test) do
+    :ok
+  end
+
+  def test_finished(test_case, test, result) do
+    :gen_server.call(__MODULE__, { :each, test_case, test, result })
+  end
+
+  ## Old API
+
   def start do
     { :ok, pid } = :gen_server.start_link(__MODULE__, [], [])
     pid
