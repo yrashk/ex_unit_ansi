@@ -7,7 +7,7 @@ An ANSI color sequence enabling formatter for ExUnit. If its printing to a TTY, 
 Just add
 
 ```elixir
-ExUnit.configure formatter: ExUnit.ANSIFormatter
+ExUnit.configure formatter: ExUnit.Formatter.ANSI
 ```
 
 after `ExUnit.start` in your test/test_helper.exs file

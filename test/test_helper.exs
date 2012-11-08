@@ -1,2 +1,2 @@
 ExUnit.start
-ExUnit.configure formatter: ExUnit.ANSIFormatter
+ExUnit.configure formatter: ExUnit.Formatter.ANSI

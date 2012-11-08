@@ -1,4 +1,4 @@
-defmodule ExUnit.ANSIFormatter do
+defmodule ExUnit.Formatter.ANSI do
   @moduledoc false
 
   use GenServer.Behaviour
