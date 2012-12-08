@@ -9,28 +9,33 @@ defmodule ExUnit.Formatter.ANSI do
 
   ## New API
 
-  def suite_started do
+  def suite_started() do
     :gen_server.start_link({ :local, __MODULE__ }, __MODULE__, [], [])
   end
 
-  def suite_finished do
-    :gen_server.call(__MODULE__, :finish)
+  def suite_started(opts) do
+    { :ok, pid } = :gen_server.start_link(__MODULE__, [], [])
+    pid
   end
 
-  def case_started(_) do
+  def suite_finished(id // __MODULE__) do
+    :gen_server.call(id, :finish)
+  end
+
+  def case_started(_id // __MODULE__, _) do
     :ok
   end
 
-  def case_finished(_) do
+  def case_finished(_id // __MODULE__, _) do
     :ok
   end
 
-  def test_started(_test_case, _test) do
+  def test_started(_id // __MODULE__, _test_case, _test) do
     :ok
   end
 
-  def test_finished(test_case, test, result) do
-    :gen_server.call(__MODULE__, { :each, test_case, test, result })
+  def test_finished(id // __MODULE__, test_case, test, result) do
+    :gen_server.call(id, { :each, test_case, test, result })
   end
 
   ## Old API
