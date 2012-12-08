@@ -51,24 +51,24 @@ defmodule ExUnit.Formatter.ANSI do
 
   def handle_call({:each, _test_case, _test, nil }, _from, Config[isatty: false] = config) do
     IO.write "."
-    { :reply, :ok, config.increment_counter }
+    { :reply, :ok, config.update_counter(&1 + 1) }
   end
 
   def handle_call({:each, _test_case, _test, nil }, _from, Config[isatty: true] = config) do
     IO.write ANSI.green(".") <> ANSI.reset
-    { :reply, :ok, config.increment_counter }
+    { :reply, :ok, config.update_counter(&1 + 1) }
   end
 
   def handle_call({:each, test_case, test, failure }, _from, Config[isatty: false] = config) do
     IO.write "F"
-    { :reply, :ok, config.increment_counter.
-      prepend_failures([{test_case, test, failure}]) }
+    { :reply, :ok, config.update_counter(&1 + 1).
+      update_failures([{test_case, test, failure}|&1]) }
   end
 
   def handle_call({:each, test_case, test, failure }, _from, Config[isatty: true] = config) do
     IO.write ANSI.red("F") <> ANSI.reset
-    { :reply, :ok, config.increment_counter.
-      prepend_failures([{test_case, test, failure}]) }
+    { :reply, :ok, config.update_counter(&1 + 1).
+      update_failures([{test_case, test, failure}|&1]) }
   end
 
   def handle_call({:each_case, _test_case}, _from, config) do
