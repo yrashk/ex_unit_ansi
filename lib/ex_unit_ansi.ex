@@ -5,7 +5,7 @@ defmodule ExUnit.Formatter.ANSI do
 
   defrecord Config, counter: 0, failures: [], isatty: false
 
-  import Exception, only: [format_stacktrace: 1]
+  import Exception, only: [format_entry: 1]
 
   ## New API
 
@@ -55,7 +55,7 @@ defmodule ExUnit.Formatter.ANSI do
   end
 
   def handle_call({:each, _test_case, _test, nil }, _from, Config[isatty: true] = config) do
-    IO.write ANSI.green(".") <> ANSI.reset
+    IO.write ANSI.green <> "." <> ANSI.reset
     { :reply, :ok, config.update_counter(&1 + 1) }
   end
 
@@ -66,7 +66,7 @@ defmodule ExUnit.Formatter.ANSI do
   end
 
   def handle_call({:each, test_case, test, failure }, _from, Config[isatty: true] = config) do
-    IO.write ANSI.red("F") <> ANSI.reset
+    IO.write ANSI.red <> "F" <> ANSI.reset
     { :reply, :ok, config.update_counter(&1 + 1).
       update_failures([{test_case, test, failure}|&1]) }
   end
@@ -80,7 +80,7 @@ defmodule ExUnit.Formatter.ANSI do
     Enum.reduce Enum.reverse(config.failures), 1, print_failure(&1, &2, config)
     failures_count = length(config.failures)
     if config.isatty do
-      IO.puts "#{config.counter} tests, #{ANSI.green(config.counter - failures_count) <> ANSI.reset} passed, #{ANSI.red(failures_count) <> ANSI.reset} failed."
+      IO.puts "#{config.counter} tests, #{ANSI.green} #{inspect (config.counter - failures_count)} #{ANSI.reset} passed, #{ANSI.red} #{inspect failures_count} #{ANSI.reset} failed."
     else
       IO.puts "#{config.counter} tests, #{config.counter - failures_count} passed, #{failures_count} failed."    
     end
@@ -91,7 +91,7 @@ defmodule ExUnit.Formatter.ANSI do
     if config.isatty, do: IO.write ANSI.red
     IO.puts "#{acc}) #{test} (#{inspect test_case})"
     IO.puts "  ** #{format_catch(kind, reason)}\n  stacktrace:"
-    Enum.each filter_stacktrace(stacktrace), fn(s) -> IO.puts "    #{format_stacktrace(s)}" end
+    Enum.each filter_stacktrace(stacktrace), fn(s) -> IO.puts "    #{format_entry(s)}" end
     IO.write "\n"
     if config.isatty, do: IO.write ANSI.reset
     acc + 1
